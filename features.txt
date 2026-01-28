@@ -1,0 +1,5 @@
+- email ✅
+- link a rubric rating to a rubric rating from another submission
+- have a preferences file that has:
+    - default course/last course on open
+    - 
