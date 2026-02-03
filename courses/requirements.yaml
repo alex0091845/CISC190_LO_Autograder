@@ -1,0 +1,42 @@
+course_id: "12345"
+learning_outcomes:
+  - "LO1 - Variables":
+      levels:
+        - level: "intern"
+          requirements:
+            assignment: "M1 Read and Try: Using Methods and Parameters"
+        - level: "junior"
+          requirements:
+            and:
+              - assignment: "M1 Draw My Name"
+              - assignment: "M1 Share: Draw My Name"
+        - level: "middle"
+          requirements:
+            assignment: "M1 Explain: Using Methods and Parameters"
+        - level: "senior"
+          requirements:
+            and:
+              - level_ref: "middle"
+              - criteria:
+                  assignment: "Create Your Own Final Project Submission"
+                  description: "LO 1 - Variables"
+  - "LO2 - Using Methods":
+      levels:
+        - level: "intern"
+          requirements:
+            assignment: "M1 Read and Try: Using Methods and Parameters"
+        - level: "junior"
+          requirements:
+            and:
+              - assignment: "M1 Draw My Name"
+              - assignment: "M1 Share: Draw My Name"
+        - level: "middle"
+          requirements:
+            assignment: "M1 Explain: Using Methods and Parameters"
+        - level: "senior"
+          requirements:
+            and:
+              - level_ref: "middle"
+              - criteria:
+                  assignment: "Create Your Own Final Project Submission"
+                  description: "LO 2 - Using Methods"

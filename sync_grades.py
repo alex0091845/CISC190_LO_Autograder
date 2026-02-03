@@ -1,6 +1,6 @@
 import argparse
 from config import *
-from students import *
+from repositories.student_repository import *
 from assignments import Assignments
 from lo import LOs
 from rubric import *

@@ -1,7 +1,6 @@
 import requests
 from pathlib import Path
 from config import API_BASE_URL, COURSE_ID, HEADERS, INSTRUCTOR_SIGNOFF
-from students import Students
 
 
 def get_latest_report(student_name):
