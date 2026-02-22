@@ -11,6 +11,7 @@ class LoService:
         self.context = context
         self.assignment_service: AssignmentService | None = None
         self.submission_service: SubmissionService | None = None
+        self.initialize()
 
     def initialize(self):
         if self.lo_repository.is_initialized(): return
@@ -22,9 +23,18 @@ class LoService:
         self.lo_repository.initialize_from_yaml(file_path)
     
     def evaluate(self, **params) -> LoResult:
-        self.lo_repository.evaluate(**params)
-
-        return LoResult()
+        return self.lo_repository.evaluate(**params)
     
-    def get_lo_by_name(self, lo_name: str, exact_match: bool=True):
-        return self.lo_repository.get_lo_by_name(lo_name, exact_match)
+    def get_lo_by_name(self, lo_name: str, exact_match: bool=False):
+        lo = self.lo_repository.get_lo_by_name(lo_name, exact_match)
+        # print(f"Got {lo_name=}: {lo=} ")
+        return lo
+    
+    def get_lo_id_by_name(self, lo_name: str):
+        return self.lo_repository.get_lo_id_by_name(lo_name)
+
+    def get_lo_results_by_name(self, lo_name: str):
+        return self.lo_repository.get_lo_result_by_name(lo_name)
+    
+    def get_lo_names(self):
+        return self.lo_repository.los.keys()

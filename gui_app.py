@@ -10,7 +10,7 @@ from repositories.student_repository import get_all_students
 from sync_grades import GradeSync
 from lo import LOs
 from config import CURR_MODULE, COURSE_ID
-from services.send_email import send_emails
+from services.email_service import send_emails
 from api import get_course_info
 
 class GradesSyncApp:

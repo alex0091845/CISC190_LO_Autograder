@@ -1,4 +1,5 @@
-from overrides import override
+from typing import override
+
 from models.requirements.requirement_node import RequirementNode
 from models.requirements.requirement_result import RequirementResult
 

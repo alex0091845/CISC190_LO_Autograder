@@ -63,5 +63,5 @@ class AssignmentService:
     
     def init_repository(self, forced_refresh=False):
         if not self.assignment_repository.has_data() or forced_refresh:
-            result = fetch_all_assignments(self.context.course_id)
+            result = fetch_all_assignments(self.context.get("course_id"))
             self.assignment_repository.cache_assignments(result)

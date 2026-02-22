@@ -1,0 +1,89 @@
+course_id: "12345"
+learning_outcomes:
+  - "LO1: Variables":
+      module: 1
+      levels:
+        - level: "intern"
+          requirements:
+            assignment: "M1 Read and Try: Using Methods and Parameters"
+        - level: "junior"
+          requirements:
+            and:
+              - assignment: "M1 Draw My Name"
+              - assignment: "M1 Share: Draw My Name"
+        - level: "middle"
+          requirements:
+            assignment: "M1 Explain: Using Methods and Parameters"
+        - level: "senior"
+          requirements:
+            and:
+              - level_ref: "middle"
+              - criteria:
+                  assignment: "Create Your Own Final Project Submission"
+                  description: "LO 1 - Variables"
+  - "LO2: Using Methods":
+      module: 1
+      levels:
+        - level: "intern"
+          requirements:
+            assignment: "M1 Read and Try: Using Methods and Parameters"
+        - level: "junior"
+          requirements:
+            and:
+              - assignment: "M1 Draw My Name"
+              - assignment: "M1 Share: Draw My Name"
+        - level: "middle"
+          requirements:
+            assignment: "M1 Explain: Using Methods and Parameters"
+        - level: "senior"
+          requirements:
+            and:
+              - level_ref: "middle"
+              - criteria:
+                  assignment: "Create Your Own Final Project Submission"
+                  description: "LO 2 - Using Methods"
+  - "LO3: Writing Methods":
+      module: 2
+      levels:
+        - level: "intern"
+          requirements:
+            assignment: "M2 Read and Try: Writing Methods"
+        - level: "junior"
+          requirements:
+            and:
+              - assignment: "M2 Draw Shape"
+              - assignment: "M2 Share: Draw Shape"
+        - level: "middle"
+          requirements:
+            assignment: "M2 Explain: Writing Methods"
+        - level: "senior"
+          requirements:
+            and:
+              - level_ref: "middle"
+              - criteria:
+                  assignment: "Create Your Own Final Project Submission"
+                  description: "LO 3 - Writing Methods"
+  - "LO4: Arrays":
+      module: 3
+      levels:
+        - level: "intern"
+          requirements:
+            assignment: "M3 Read and Try: Loops and Arrays"
+        - level: "junior"
+          requirements:
+            and:
+              - or:
+                - assignment: "M3 Paint a Picture"
+                - assignment: "M3 Color Subtraction"
+              - assignment: "M3 Tri-effect"
+              - assignment: "M3 Share: Loops and Arrays"
+        - level: "middle"
+          requirements:
+            assignment: "M3 Explain: Arrays and Tracing Code"
+        - level: "senior"
+          requirements:
+            and:
+              - level_ref: "middle"
+              - criteria:
+                  assignment: "Create Your Own Final Project Submission"
+                  description: "LO 4 - Writing Methods"

@@ -49,16 +49,13 @@ class SubmissionRepository:
         Returns:
             The cached submission dictionary, or None if not found.
         """
-        print(f"{assignment_id=}")
         if not self.submissions or user_id not in self.user_submissions_cache:
             print(f"Submission cache empty or missing entry for student '{user_id}', fetching submissions for user ID {user_id}...")
-            submissions = fetch_submissions(self.context.course_id, user_id)
+            submissions = fetch_submissions(self.context.get("course_id"), user_id)
             self.cache_submissions(submissions)
 
         result = self.submissions.get((assignment_id, user_id), None)
-        # print(f"{result=}")
-
-        # print(f"Retrieved submission for '{assignment_id}', user ID {user_id}: {result['name'] if result is not None else None}")
+        
         return result
 
     def is_complete(self, assignment_id: int, student_id: int) -> bool:

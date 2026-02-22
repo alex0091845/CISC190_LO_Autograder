@@ -1,23 +1,16 @@
 from models.level import Level
-from models.requirements.lo_result import LoResult
 
 
 class Lo:
-    def __init__(self, id: int, name: str = "", levels: dict[str, Level] = {}):
+    def __init__(self,
+                 id: int,
+                 name: str = "",
+                 levels: dict[str, Level] = {},
+                 module: int = -1):
         self.id = id
         self.name = name
         self.levels = levels
-
-    def evaluate(self, course_id, student_id, submission_service) -> LoResult:
-        # TODO
-        return LoResult()
-        # results = []
-        # for level in self.levels:
-        #     result = level.evaluate(course_id, student_id, submission_service)
-        #     if result is not None:
-        #         results.append((level, result))
-        
-        # return results
+        self.module = module
 
     def has_level(self, name: str) -> bool:
         for level in self.levels:
@@ -27,7 +20,6 @@ class Lo:
 
     def get_level(self, name: str) -> Level | None:
         for level_name, level in self.levels.items():
-            print(f"Looking for {name=} in {level_name=}")
             if name in level_name.lower():
                 return level
         return None

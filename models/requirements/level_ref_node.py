@@ -20,7 +20,8 @@ class LevelRefNode(RequirementNode):
 
         if not level is None:
             result = level.evaluate(**params)
-            return result
+            if result and result.satisfied:
+                return RequirementResult(True, [], [])
         
         return RequirementResult(False, [self.ref_level_name], [])
 

@@ -32,12 +32,8 @@ class SubmissionService:
         result = None
 
         if not self.has_submission(user_id, assignment_id, assignment_name) or refresh:
-            print("hello?? Before fetch")
-            result = fetch_submissions(self.context.course_id, user_id)
-            print("hello?? After fetch")
-            print("hellO?? before cache")
+            result = fetch_submissions(self.context.get("course_id"), user_id)
             self.submission_repository.cache_submissions(result)
-            print("hellO?? after cache")
 
         assignment_id = self._get_assignment_id(assignment_id, assignment_name)
         return self.submission_repository.get_submission(user_id, assignment_id)

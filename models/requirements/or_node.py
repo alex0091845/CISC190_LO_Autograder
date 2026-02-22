@@ -1,4 +1,4 @@
-from overrides import override
+from typing import override
 from models.requirements.requirement_node import RequirementNode
 from models.requirements.requirement_result import RequirementResult
 
@@ -9,11 +9,11 @@ class OrNode(RequirementNode):
     
     @override
     def evaluate(self, **params) -> RequirementResult:
-        """Returns True if all of the assignments are complete for the set student_id.
+        """Returns True if any of the assignments are complete for the set student_id.
         Args:
             completed_assignments: Set of completed assignments.
         Returns:
-            True if all assignments are complete, False otherwise.
+            True if any assignments are complete, False otherwise.
         """
         missing_list = []
         completed_list = []

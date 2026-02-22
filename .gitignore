@@ -1,6 +1,9 @@
 # Secrets (for now)
 config*.py
 
+# Personal data files
+reports/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
