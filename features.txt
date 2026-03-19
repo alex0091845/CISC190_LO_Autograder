@@ -3,17 +3,27 @@
     - default course/last course on open
     - 
 
+- As a developer, I can implement a single, consistent way to extract report file names
+  so that the code is cleaner and more maintainable.
+
+- As a developer, I can add caching to each student's evaluation results so that if the user
+  wants to re-run the program with different settings, they don't necessarily have to
+  re-evaluate each LO for each student.
+
+- As a developer, I can test each individual run buttons for each workflow step so that
+  I can ensure that each step works correctly when executed individually.
+
 - As a developer, I can ask AI to look through the codebase and suggest whether certain
   ids should be a string type or an integer type and then change the codebase accordingly
   so that the code is more consistent and easier to work with. ✅
 
 - As a user, I can easily customize the options before running the program
   (e.g., whether to grade submissions, which students to grade, etc.) so that
-  I can efficiently use the program without having to modify the code.
+  I can efficiently use the program without having to modify the code. ✅
 
 - As a developer, I can set up the AppView such that it allows the user to customize
   the options for running the program so that the user can efficiently use the program
-  without modifying the code.
+  without modifying the code. ✅
 
 - As a developer, I can set up an App object so that the program maintains
   state across different functions and modules, allowing for better organization
@@ -32,5 +42,5 @@
 - As a developer, I can fix the report view issue so that it correctly displays the
   report for the selected student. ✅
 
-- As a developer, I can implement a single, consistent way to extract report file names
-  so that the code is cleaner and more maintainable.
+- As a developer, I can refactor the app such that each workflow step is a function
+  that goes through all students so that each workflow step can be executed individually. ✅
