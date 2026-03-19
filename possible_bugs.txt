@@ -1,0 +1,3 @@
+- If you have multiple of the same assignment (for example, like duplicate due
+  to importing), the program will only grade the first one it finds. Will think
+  about how to handle this case in the future.

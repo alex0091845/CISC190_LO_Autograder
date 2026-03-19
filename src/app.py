@@ -79,37 +79,59 @@ class App:
         root.mainloop()
 
     def sync(self):
-        student_obj_list = [self.student_service.get_student(student_id)
+        self.student_obj_list = [self.student_service.get_student(student_id)
                             for student_id in self.context.student_list]
-        lo_name_to_result: dict[int, dict[str, LoResult]] = {}
+        self.lo_name_to_result: dict[int, dict[str, LoResult]] = {}
 
         if self.context.should_grade:
-            lo_name_to_result = self.lo_service.evaluate_multiple(
-                student_obj_list,
-                course_id=self.context.course_id,
-                lo_list=self.context.lo_list,
-                assignment_service=self.assignment_service,
-                submission_service=self.submission_service
-            )
+            self.grade()
 
         if self.context.should_mark_rubric:
-            self.rubric_rating_service.update_rubric_assessments(
-                lo_name_to_result,
-                self.assignment_service,
-                student_list=student_obj_list
-            )
+            self.mark_rubric()
 
         if self.context.should_generate_report:
-            self.report_service.generate_reports(
-                student_obj_list,
-                lo_name_to_result
-            )
+            self.generate_reports()
         
         if self.context.should_email_report:
-            self.email_service.send_emails(
-                student_obj_list,
-                self.report_service
-            )
+            self.email_reports()
+    
+    def grade(self):
+        self.lo_name_to_result = self.lo_service.evaluate_multiple(
+            self.student_obj_list,
+            course_id=self.context.course_id,
+            lo_list=self.context.lo_list,
+            assignment_service=self.assignment_service,
+            submission_service=self.submission_service
+        )
+
+        return self.lo_name_to_result
+
+    def mark_rubric(self):
+        if not self.lo_name_to_result:
+            print("No LO results found, cannot mark rubric. Please run grading first.")
+            return
+        
+        self.rubric_rating_service.update_rubric_assessments(
+            self.lo_name_to_result,
+            self.assignment_service,
+            student_list=self.student_obj_list
+        )
+    
+    def generate_reports(self):
+        if not self.lo_name_to_result:
+            print("No LO results found, cannot generate reports. Please run grading first.")
+            return
+        
+        self.report_service.generate_reports(
+            self.student_obj_list,
+            self.lo_name_to_result
+        )
+    
+    def email_reports(self):
+        self.email_service.send_emails(
+            self.student_obj_list,
+            self.report_service
+        )
 
     def _setup_context(self, context: AutograderContext, config):
         '''

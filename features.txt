@@ -11,7 +11,10 @@
   re-evaluate each LO for each student.
 
 - As a developer, I can test each individual run buttons for each workflow step so that
-  I can ensure that each step works correctly when executed individually.
+  I can ensure that each step works correctly when executed individually. ✅
+
+- As a user, I can set the module number so that the program only runs the grading and
+  rubric marking for the LOs in that module.
 
 - As a developer, I can ask AI to look through the codebase and suggest whether certain
   ids should be a string type or an integer type and then change the codebase accordingly

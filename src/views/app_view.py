@@ -8,6 +8,7 @@ from datetime import datetime
 
 from models.student import Student
 from utils.enums import GetGradeType
+from utils.naming import get_student_folder_name
 
 class AppView:
     def __init__(self, root, app):
@@ -171,27 +172,31 @@ class AppView:
         # Workflow steps: checkbox + label + run button
         self.workflow_vars = {}
         self._step_buttons = {}
-        workflow_steps = [
-            ("should_grade",           "Grade"),
-            ("should_mark_rubric",     "Mark Rubric"),
-            ("should_generate_report", "Gen. Report"),
-            ("should_email_report",    "Email Report"),
-        ]
-        for attr, label in workflow_steps:
-            step_row = tk.Frame(settings_frame)
-            step_row.pack(fill=tk.X, pady=1)
 
-            var = tk.BooleanVar(value=getattr(self.app.context, attr))
-            self.workflow_vars[attr] = var
-
-            cb = tk.Checkbutton(step_row, variable=var,
-                                command=lambda a=attr, v=var: self.on_workflow_flag_changed(a, v))
-            cb.pack(side=tk.LEFT)
-            tk.Label(step_row, text=label, font=("Arial", 9), anchor="w").pack(side=tk.LEFT, fill=tk.X, expand=True)
-            btn = tk.Button(step_row, text="Run", font=("Arial", 7, "bold"), bg="#2196F3", fg="white",
-                            command=lambda a=attr: self.run_single_step(a), width=4)
-            btn.pack(side=tk.RIGHT)
-            self._step_buttons[attr] = btn
+        self.grade_button = self.setup_workflow_step_button(
+            "should_grade",
+            "Grade",
+            settings_frame,
+            self.start_grading
+        )
+        self.mark_rubric_button = self.setup_workflow_step_button(
+            "should_mark_rubric",
+            "Mark Rubric",
+            settings_frame,
+            self.start_mark_rubric
+        )
+        self.generate_report_button = self.setup_workflow_step_button(
+            "should_generate_report",
+            "Gen. Report",
+            settings_frame,
+            self.start_generate_reports
+        )
+        self.email_report_button = self.setup_workflow_step_button(
+            "should_email_report",
+            "Email Report",
+            settings_frame,
+            self.start_email_reports
+        )
 
         # Bottom bar - Status and Sync button
         bottom_frame = tk.Frame(self.root, bg="#f0f0f0", height=50)
@@ -208,19 +213,6 @@ class AppView:
         )
         self.status_label.pack(side=tk.LEFT, padx=20)
         
-        # Send Email button
-        self.email_button = tk.Button(
-            bottom_frame,
-            text="Send Emails",
-            font=("Arial", 10, "bold"),
-            bg="#FF9800",
-            fg="white",
-            command=self.send_emails_to_selected,
-            width=12,
-            height=1
-        )
-        self.email_button.pack(side=tk.RIGHT, padx=10, pady=5)
-
         # Global Refresh button (right of status, left of Sync)
         self.refresh_all_button = tk.Button(
             bottom_frame,
@@ -246,6 +238,133 @@ class AppView:
             height=1
         )
         self.sync_button.pack(side=tk.RIGHT, padx=20, pady=5)
+    
+    def setup_workflow_step_button(self, attr, label, settings_frame, callback):
+        step_row = tk.Frame(settings_frame)
+        step_row.pack(fill=tk.X, pady=1)
+
+        var = tk.BooleanVar(value=getattr(self.app.context, attr))
+        self.workflow_vars[attr] = var
+
+        cb = tk.Checkbutton(step_row, variable=var,
+                            command=lambda a=attr, v=var: self.on_workflow_flag_changed(a, v))
+        cb.pack(side=tk.LEFT)
+        tk.Label(step_row, text=label, font=("Arial", 9), anchor="w").pack(side=tk.LEFT, fill=tk.X, expand=True)
+        btn = tk.Button(step_row, text="Run", font=("Arial", 7, "bold"), bg="#2196F3", fg="white",
+                        command=lambda a=attr: callback(), width=4)
+        btn.pack(side=tk.RIGHT)
+        self._step_buttons[attr] = btn
+
+        return btn
+
+    def start_grading(self):
+        # Disable sync button
+        self.grade_button.config(state=tk.DISABLED)
+        self.update_status("Grading...")
+
+        thread = Thread(target=self.grade)
+        thread.daemon = True
+        thread.start()
+
+    def grade(self):
+        try:
+            self.app.context.grade_type = GetGradeType[self.grade_type_var.get()]
+            self.app.student_obj_list = self.get_selected_students()
+            self.app.context.lo_list = self.get_selected_los()
+            self.app.context.curr_module = self.module_var.get()
+
+            self.app.grade()
+            self.root.after(0, self.grade_complete, True)
+        except Exception as e:
+            self.root.after(0, self.grade_complete, False, str(e))
+
+    def grade_complete(self, success, error_message=None):
+        if success:
+            self.update_status("Grading complete!")
+            self.grade_button.config(state=tk.NORMAL)
+        else:
+            self.update_status(f"Grading failed: {error_message}")
+
+    def start_mark_rubric(self):
+        self.mark_rubric_button.config(state=tk.DISABLED)
+        self.update_status("Marking rubric...")
+        thread = Thread(target=self.mark_rubric)
+        thread.daemon = True
+        thread.start()
+
+    def mark_rubric(self):
+        try:
+            self.app.student_obj_list = self.get_selected_students()
+            self.app.mark_rubric()
+            self.root.after(0, self.mark_rubric_complete, True)
+        except Exception as e:
+            self.root.after(0, self.mark_rubric_complete, False, str(e))
+
+    def mark_rubric_complete(self, success, error_message=None):
+        self.mark_rubric_button.config(state=tk.NORMAL)
+        if success:
+            self.update_status("Rubric marking complete!")
+        else:
+            self.update_status(f"Rubric marking failed: {error_message}")
+
+    def start_generate_reports(self):
+        self.generate_report_button.config(state=tk.DISABLED)
+        self.update_status("Generating reports...")
+        thread = Thread(target=self.generate_reports)
+        thread.daemon = True
+        thread.start()
+
+    def generate_reports(self):
+        try:
+            self.app.context.grade_type = GetGradeType[self.grade_type_var.get()]
+            self.app.student_obj_list = self.get_selected_students()
+            self.app.context.lo_list = self.get_selected_los()
+            self.app.context.curr_module = self.module_var.get()
+            self.app.generate_reports()
+            self.root.after(0, self.generate_reports_complete, True)
+        except Exception as e:
+            self.root.after(0, self.generate_reports_complete, False, str(e))
+
+    def generate_reports_complete(self, success, error_message=None):
+        self.generate_report_button.config(state=tk.NORMAL)
+        if success:
+            self.update_status("Reports generated!")
+            if self.selected_student:
+                self.show_student_report(self.selected_student)
+        else:
+            self.update_status(f"Report generation failed: {error_message}")
+
+    def start_email_reports(self):
+        self.email_report_button.config(state=tk.DISABLED)
+        self.update_status("Sending emails...")
+        thread = Thread(target=self.email_reports)
+        thread.daemon = True
+        thread.start()
+
+    def email_reports(self):
+        try:
+            self.app.student_obj_list = self.get_selected_students()
+            self.app.email_reports()
+            self.root.after(0, self.email_reports_complete, True)
+        except Exception as e:
+            self.root.after(0, self.email_reports_complete, False, str(e))
+
+    def email_reports_complete(self, success, error_message=None):
+        self.email_report_button.config(state=tk.NORMAL)
+        if success:
+            self.update_status("Emails sent!")
+        else:
+            self.update_status(f"Email sending failed: {error_message}")
+
+    def get_selected_los(self):
+        return [lo_name for lo_name, var in self.lo_checkboxes.items() if var.get()]
+
+    def get_selected_student_ids(self):
+        return [student_id for student_id, var in self.student_checkboxes.items() if var.get()]
+
+    def get_selected_students(self):
+        selected_ids = set(self.get_selected_student_ids())
+        return [student for student in self.students if student.student_id in selected_ids]
 
     def refresh_students(self):
         """Refresh the students list from students.json for the selected course."""
@@ -440,11 +559,8 @@ class AppView:
         
         # Find the student's reports directory
         reports_dir = Path("reports")
-        
-        # Create sanitized name for directory lookup
-        student_name_parts = student.name.split()
-        sanitized_name = "_".join(student_name_parts)
-        student_dir = "user_data" / reports_dir / sanitized_name
+
+        student_dir = Path("user_data") / reports_dir / get_student_folder_name(student.name)
         
         if student_dir.exists():
             # Find the latest report
@@ -488,20 +604,14 @@ class AppView:
     def start_sync(self):
         """Start the grade sync process in a background thread."""
         # Get selected students
-        selected_student_ids = [
-            student_id for student_id, var in self.student_checkboxes.items()
-            if var.get()
-        ]
+        selected_student_ids = self.get_selected_student_ids()
         
         if not selected_student_ids:
             self.update_status("No students selected")
             return
         
         # Get selected LOs
-        selected_los = [
-            lo_name for lo_name, var in self.lo_checkboxes.items()
-            if var.get()
-        ]
+        selected_los = self.get_selected_los()
         
         if not selected_los:
             self.update_status("No LOs selected")
@@ -559,95 +669,21 @@ class AppView:
             messagebox.showwarning("Empty Report", "Cannot save an empty report.")
             return
         
-        # Create sanitized name for directory
-        student_name_parts = student_name.split()
-        if len(student_name_parts) >= 2:
-            sanitized_name = f"{student_name_parts[0]}_{student_name_parts[-1]}"
-            reports_dir = Path("reports") / sanitized_name
-            reports_dir.mkdir(parents=True, exist_ok=True)
-            
-            # Generate filename with timestamp
-            timestamp = datetime.now().strftime("%Y-%m-%d")
-            filename = f"progress_report_{sanitized_name.lower()}_{timestamp}.txt"
-            filepath = reports_dir / filename
-            
-            try:
-                with open(filepath, 'w', encoding='utf-8') as f:
-                    f.write(report_content)
-                
-                self.update_status(f"Report saved for {student_name}")
-                # messagebox.showinfo("Success", f"Report saved successfully to {filepath}")
-            except Exception as e:
-                self.update_status(f"Error saving report: {str(e)}")
-                messagebox.showerror("Error", f"Failed to save report: {str(e)}")
-        else:
-            messagebox.showerror("Error", "Invalid student name format.")
-    
-    def send_emails_to_selected(self):
-        """Send emails to all selected students in a background thread."""
-        # Get selected students
-        selected_student_ids = [
-            student_id for student_id, var in self.student_checkboxes.items()
-            if var.get()
-        ]
-        
-        if not selected_student_ids:
-            messagebox.showwarning("No Students Selected", "Please select at least one student to send emails.")
-            return
-        
-        # Confirm action
-        result = messagebox.askyesno(
-            "Confirm Send",
-            f"Send progress reports to {len(selected_student_ids)} selected student(s)?\n\nThis will send via Canvas Inbox."
-        )
-        
-        if not result:
-            return
-        
-        # Disable email button
-        self.email_button.config(state=tk.DISABLED)
-        self.update_status(f"Sending emails to {len(selected_student_ids)} students...")
-        
-        # Run email sending in background thread
-        thread = Thread(target=self.run_send_emails, args=(selected_student_ids,))
-        thread.daemon = True
-        thread.start()
-    
-    def run_send_emails(self, student_ids: list[int]):
-        """Run the email sending process in background."""
+        student_dir = Path("user_data") / "reports" / get_student_folder_name(student_name)
+        student_dir.mkdir(parents=True, exist_ok=True)
+
+        timestamp = datetime.now().strftime("%Y-%m-%d")
+        filename = f"progress_report_{student_name.lower().replace(' ', '_')}_{timestamp}.txt"
+        filepath = student_dir / filename
+
         try:
-            sent_count = failed_count = 0
-            for student_id in student_ids:
-                student = self.app.student_service.get_student(student_id)
-
-                sent = self.app.email_service.send_email(
-                    student_id=student_id,
-                    subject="Your Progress Report",
-                    body=self.app.report_service.get_latest_report(student.name)
-                )
-
-                if sent:
-                    sent_count += 1
-                else:
-                    failed_count += 1
-            
-            # Update UI on completion
-            self.root.after(0, self.email_complete, True, sent_count, failed_count)
+            with open(filepath, 'w', encoding='utf-8') as f:
+                f.write(report_content)
+            self.update_status(f"Report saved for {student_name}")
         except Exception as e:
-            self.root.after(0, self.email_complete, False, 0, 0, str(e))
+            self.update_status(f"Error saving report: {str(e)}")
+            messagebox.showerror("Error", f"Failed to save report: {str(e)}")
     
-    def email_complete(self, success, sent_count=0, failed_count=0, error_msg=None):
-        """Handle email sending completion."""
-        self.email_button.config(state=tk.NORMAL)
-        
-        if success:
-            message = f"Emails sent successfully!\n\nSent: {sent_count}\nFailed: {failed_count}"
-            self.update_status(f"Email complete: {sent_count} sent, {failed_count} failed")
-            messagebox.showinfo("Email Complete", message)
-        else:
-            self.update_status(f"Email failed: {error_msg}")
-            messagebox.showerror("Email Failed", f"Error sending emails: {error_msg}")
-
     def on_module_changed(self):
         """Update curr_module in context when the spinbox value changes."""
         try:
@@ -662,60 +698,3 @@ class AppView:
     def on_workflow_flag_changed(self, attr, var):
         """Sync a workflow checkbox state back to context."""
         setattr(self.app.context, attr, var.get())
-
-    def run_single_step(self, step_attr):
-        """Run a single workflow step in a background thread using the current UI selections."""
-        selected_student_ids = [
-            str(student_id) for student_id, var in self.student_checkboxes.items()
-            if var.get()
-        ]
-        if not selected_student_ids:
-            self.update_status("No students selected")
-            return
-
-        selected_los = [
-            lo_name for lo_name, var in self.lo_checkboxes.items()
-            if var.get()
-        ]
-        if not selected_los:
-            self.update_status("No LOs selected")
-            return
-
-        self._step_buttons[step_attr].config(state=tk.DISABLED)
-        self.sync_button.config(state=tk.DISABLED)
-        step_label = step_attr.replace("should_", "").replace("_", " ").title()
-        self.update_status(f"Running {step_label}...")
-
-        thread = Thread(target=self._execute_single_step,
-                        args=(step_attr, selected_student_ids, selected_los))
-        thread.daemon = True
-        thread.start()
-
-    def _execute_single_step(self, step_attr, student_ids, los):
-        """Execute one workflow step, temporarily overriding context flags."""
-        try:
-            self.app.context.student_list = student_ids
-            self.app.context.lo_list = los
-            for flag in self.workflow_vars:
-                setattr(self.app.context, flag, flag == step_attr)
-            self.app.sync()
-            self.root.after(0, self.single_step_complete, step_attr, True)
-        except Exception as e:
-            self.root.after(0, self.single_step_complete, step_attr, False, str(e))
-        finally:
-            # Restore flags from checkbox state — the authoritative source of truth.
-            # This correctly handles checkboxes toggled while the step was running.
-            for flag, var in self.workflow_vars.items():
-                setattr(self.app.context, flag, var.get())
-
-    def single_step_complete(self, step_attr, success, error_msg=None):
-        """Handle completion of a single-step run."""
-        self._step_buttons[step_attr].config(state=tk.NORMAL)
-        self.sync_button.config(state=tk.NORMAL)
-        step_label = step_attr.replace("should_", "").replace("_", " ").title()
-        if success:
-            self.update_status(f"{step_label} completed successfully!")
-            if self.selected_student:
-                self.show_student_report(self.selected_student)
-        else:
-            self.update_status(f"{step_label} failed: {error_msg}")
