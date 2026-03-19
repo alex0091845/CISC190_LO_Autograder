@@ -1,8 +1,9 @@
-# Secrets (for now)
-config*.py
+# Secrets
+.env
 
-# Personal data files
-reports/
+# Personal/sensitive data files
+user_data/reports/
+courses/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

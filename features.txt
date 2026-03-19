@@ -1,5 +1,36 @@
-- email ✅
 - link a rubric rating to a rubric rating from another submission
 - have a preferences file that has:
     - default course/last course on open
     - 
+
+- As a developer, I can ask AI to look through the codebase and suggest whether certain
+  ids should be a string type or an integer type and then change the codebase accordingly
+  so that the code is more consistent and easier to work with. ✅
+
+- As a user, I can easily customize the options before running the program
+  (e.g., whether to grade submissions, which students to grade, etc.) so that
+  I can efficiently use the program without having to modify the code.
+
+- As a developer, I can set up the AppView such that it allows the user to customize
+  the options for running the program so that the user can efficiently use the program
+  without modifying the code.
+
+- As a developer, I can set up an App object so that the program maintains
+  state across different functions and modules, allowing for better organization
+  and easier access to shared data. ✅
+
+- As a developer, I can establish a composition relationship between App and
+  AppView so that the App can manage the overall application state while the AppView
+  handles the user interface, leading to a more modular and maintainable codebase. ✅
+
+- As a user, I can easily fetch the list of students for a given course so that I can
+  select them. ✅
+
+- As a developer, I can cache the list of students for a given course so that the user
+  does not have to fetch it repeatedly. ✅
+
+- As a developer, I can fix the report view issue so that it correctly displays the
+  report for the selected student. ✅
+
+- As a developer, I can implement a single, consistent way to extract report file names
+  so that the code is cleaner and more maintainable.

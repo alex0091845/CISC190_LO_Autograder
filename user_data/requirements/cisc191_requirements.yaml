@@ -1,0 +1,77 @@
+course_id: "12345"
+default_markable: false
+learning_outcomes:
+  - "LO2: 1D/2D arrays":
+      module: 2
+      levels:
+        - level: "intern"
+          requirements:
+            assignment: "M2-1 Intern Level Array (Quiz)"
+        - level: "junior"
+          requirements:
+            assignment: "M2-2 Junior Developer Programming Challenge"
+        - level: "middle"
+          requirements:
+            assignment: "M2-3 Middle Developer Programming Challenge"
+        - level: "senior"
+          requirements:
+            and:
+              - level_ref: "middle"
+              - assignment: "M2-4 Senior Developer Explanations"
+  - "LO3: Object Aggregation":
+      module: 3
+      levels:
+        - level: "intern"
+          requirements:
+            assignment: "M3-1 Beginning Classes Intern Level"
+        - level: "junior"
+          requirements:
+            assignment: "M3-2 Junior Developer Programming Challenge"
+        - level: "middle"
+          requirements:
+            assignment: "M3-3 Middle Developer Explanations"
+        - level: "senior"
+          requirements:
+            and:
+              - level_ref: "middle"
+              - criteria:
+                  assignment: "Project Submissions (Weekly Checkpoints and Final Submission)"
+                  description: "3. Construct programs utilizing objects and classes in object-oriented programming"
+  - "LO4: Inheritance and Polymorphism":
+      module: 4
+      levels:
+        - level: "intern"
+          requirements:
+            assignment: "M4-1 Advanced Classes Intern Level"
+        - level: "junior"
+          requirements:
+            assignment: "M4-2 Junior Developer Programming Challenge"
+        - level: "middle"
+          requirements:
+            assignment: "M4-3 Middle Developer Explanations"
+        - level: "senior"
+          requirements:
+            and:
+              - level_ref: "middle"
+              - criteria:
+                  assignment: "Project Submissions (Weekly Checkpoints and Final Submission)"
+                  description: "4. Construct programs utilizing inheritance and polymorphism, including abstract classes and interfaces"
+  - "LO5: Generic and Data Structures":
+      module: 5
+      levels:
+        - level: "intern"
+          requirements:
+            assignment: "M5-1 Generic Collections and Data Structures Intern Level"
+        - level: "junior"
+          requirements:
+            assignment: "M5-2 Junior Developer Programming Challenge"
+        - level: "middle"
+          requirements:
+            assignment: "M5-3 Middle Developer Explanations"
+        - level: "senior"
+          requirements:
+            and:
+              - level_ref: "middle"
+              - criteria:
+                  assignment: "Project Submissions (Weekly Checkpoints and Final Submission)"
+                  description: "5. Construct programs utilizing generic collections and data structures"
