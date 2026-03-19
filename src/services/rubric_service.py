@@ -96,17 +96,22 @@ class RubricService:
         )
 
     def update_rubric_assessments(self,
-                                  lo_result_mappings: dict[str, LoResult],
+                                  lo_result_mappings: dict[int, dict[str, LoResult]],
                                   assignment_service: AssignmentService,
                                   student_list: list[Student]):
-        for lo_name, lo_result in lo_result_mappings.items():
-            assignment_id = assignment_service.get_assignment_id(lo_name)
-            if not assignment_id:
-                print(f"No assignment found for LO {lo_name}, skipping rubric update.")
-                continue
+        for student in student_list:
+            # get the lo results for this student
+            student_id = student.student_id
+            lo_results = lo_result_mappings.get(student_id, {})
             
-            for student in student_list:
-                self.update_rubric_assessment(lo_result, assignment_id, student.student_id)
+            for lo_name, lo_result in lo_results.items():
+                assignment_id = assignment_service.get_assignment_id(lo_name)
+
+                if not assignment_id:
+                    print(f"No assignment found for LO {lo_name}, skipping rubric update.")
+                    continue
+            
+                self.update_rubric_assessment(lo_result, assignment_id, student_id)
 
     def _transform_to_payload_format(self, assessment: dict) -> dict:
         """Transform the assessment dictionary into the format required for the API payload.

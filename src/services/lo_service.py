@@ -9,8 +9,6 @@ class LoService:
     def __init__(self, lo_repository: LoRepository, context: AutograderContext):
         self.lo_repository = lo_repository
         self.context = context
-        self.assignment_service: AssignmentService | None = None
-        self.submission_service: SubmissionService | None = None
         self.initialize()
 
     def initialize(self):
@@ -29,10 +27,12 @@ class LoService:
     def evaluate_multiple(self,
                           student_list: list,
                           course_id: str,
-                          lo_list: list[str]
-                          ) -> dict[str, LoResult]:
+                          lo_list: list[str],
+                          assignment_service: AssignmentService,
+                          submission_service: SubmissionService
+                          ) -> dict[int, dict[str, LoResult]]: # {student_id to {lo_id to LoResult}}
         # LO name to LoResult objects
-        lo_name_to_result: dict[str, LoResult] = {}
+        lo_name_to_result: dict[int, dict[str, LoResult]] = {}
 
         for student in student_list:
             # evaluate each LO in lo list. Doing this here because this gives user greater
@@ -44,15 +44,18 @@ class LoService:
                 )
 
                 lo_result = self.evaluate(
-                    assignment_service=self.assignment_service,
-                    submission_service=self.submission_service,
+                    assignment_service=assignment_service,
+                    submission_service=submission_service,
                     student_id=student.student_id,
                     course_id=course_id,
                     lo=lo
                 )
 
-                lo_name_to_result[lo_name] = lo_result
-            
+                # add to results
+                if student.student_id not in lo_name_to_result:
+                    lo_name_to_result[student.student_id] = {}
+                lo_name_to_result[student.student_id][lo_name] = lo_result
+
         return lo_name_to_result
     
     def get_lo_by_name(self, lo_name: str, exact_match: bool=False):

@@ -93,7 +93,7 @@ Best,
 {self.instructor_signoff}
 """
     
-    def generate_reports(self, student_list: list[Student], lo_results_mappings: dict[str, LoResult]):
+    def generate_reports(self, student_list: list[Student], lo_results_mappings: dict[int, dict[str, LoResult]]):
         """
         Generate and save progress reports for each student based on their LO results.
         
@@ -104,7 +104,7 @@ Best,
             None
         """
         for student in student_list:
-            report = self.generate_report(student.name, lo_results_mappings)
+            report = self.generate_report(student.name, lo_results_mappings.get(student.student_id, {}))
             self.save(report, student.name)
 
     def get_latest_report(self, student_name: str):

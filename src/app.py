@@ -66,10 +66,12 @@ class App:
         self.context.grade_type = GetGradeType.ON_TRACK
 
         # workflow options
-        self.context.should_mark_rubric = False
         self.context.should_grade = True
+        self.context.should_mark_rubric = False
         self.context.should_generate_report = True
         self.context.should_email_report = False
+
+        # self.sync()
 
         # GUI
         root = tk.Tk()
@@ -79,13 +81,15 @@ class App:
     def sync(self):
         student_obj_list = [self.student_service.get_student(student_id)
                             for student_id in self.context.student_list]
-        lo_name_to_result: dict[str, LoResult] = {}
+        lo_name_to_result: dict[int, dict[str, LoResult]] = {}
 
         if self.context.should_grade:
             lo_name_to_result = self.lo_service.evaluate_multiple(
                 student_obj_list,
                 course_id=self.context.course_id,
-                lo_list=self.context.lo_list
+                lo_list=self.context.lo_list,
+                assignment_service=self.assignment_service,
+                submission_service=self.submission_service
             )
 
         if self.context.should_mark_rubric:

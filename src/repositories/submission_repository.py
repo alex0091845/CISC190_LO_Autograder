@@ -88,7 +88,7 @@ class SubmissionRepository:
         grade = submission['grade']
         if not grade:
             grade = "N/A"
-
+        
         return grade
     
     def get_points(self, assignment_id: int, student_id: int) -> float:
