@@ -59,3 +59,9 @@
 
 - As a user, I can customize how to calculate the on track grade so that I can use
   different grading schemes.
+
+- As a user, I can change the settings from the GUI and it will update the configuration
+  files accordingly so that I can easily manage the settings without having to manually
+  edit the configuration files.
+
+- As a user, I can customize the report template so that I can generate reports to my liking.
