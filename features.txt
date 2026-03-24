@@ -6,15 +6,18 @@
 - As a developer, I can implement a single, consistent way to extract report file names
   so that the code is cleaner and more maintainable.
 
-- As a developer, I can add caching to each student's evaluation results so that if the user
-  wants to re-run the program with different settings, they don't necessarily have to
-  re-evaluate each LO for each student.
+- As a developer, I can add (file) caching to each student's evaluation results so that
+  if the user wants to re-run the program with different settings, they don't necessarily
+  have to re-evaluate each LO for each student.
 
 - As a developer, I can test each individual run buttons for each workflow step so that
   I can ensure that each step works correctly when executed individually. ✅
 
 - As a user, I can set the module number so that the program only runs the grading and
-  rubric marking for the LOs in that module.
+  rubric marking for the LOs for all modules up to that module. ✅
+
+- As a user, I can set the module number so that the program only generates the report
+  for the LOs for all modules up to that module. ✅
 
 - As a developer, I can ask AI to look through the codebase and suggest whether certain
   ids should be a string type or an integer type and then change the codebase accordingly
@@ -47,3 +50,12 @@
 
 - As a developer, I can refactor the app such that each workflow step is a function
   that goes through all students so that each workflow step can be executed individually. ✅
+
+- As a user, I can reload the configuration files while using the app so that I can 
+  utilize the cached data without having to restart the app.
+
+- As a user, I can cancel the syncing process while it's running so that I can stop it
+  if I realize I made a mistake in the settings.
+
+- As a user, I can customize how to calculate the on track grade so that I can use
+  different grading schemes.

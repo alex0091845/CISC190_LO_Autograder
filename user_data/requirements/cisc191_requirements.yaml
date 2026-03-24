@@ -75,3 +75,22 @@ learning_outcomes:
               - criteria:
                   assignment: "Project Submissions (Weekly Checkpoints and Final Submission)"
                   description: "5. Construct programs utilizing generic collections and data structures"
+  - "LO1: Object-Oriented Design":
+      module: 6
+      levels:
+        - level: "intern"
+          requirements:
+            assignment: "M6-1 Object-Oriented Design Intern Level"
+        - level: "junior"
+          requirements:
+            assignment: "M6-2 Junior Developer Programming Challenge"
+        - level: "middle"
+          requirements:
+            assignment: "M6-3 Middle Developer Explanations"
+        - level: "senior"
+          requirements:
+            and:
+              - level_ref: "middle"
+              - criteria:
+                  assignment: "Project Submissions (Weekly Checkpoints and Final Submission)"
+                  description: "1. Employ design principles of OOP"

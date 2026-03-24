@@ -55,7 +55,7 @@ class App:
         self.rubric_rating_service = RubricService(self.context, self.rubric_repository, self.lo_service, self.api)
 
         self.report_repository = ReportRepository(self.context)
-        self.report_service = ReportService(self.context, self.report_repository, self.grade_service, self.lo_service)
+        self.report_service = ReportService(self.context, self.report_repository, self.grade_service, self.lo_service, self.config.INSTRUCTOR_SIGNOFF)
         self.email_service = EmailService(self.context, self.student_service, self.api)
 
         # the rest of the contexts
@@ -124,7 +124,8 @@ class App:
         
         self.report_service.generate_reports(
             self.student_obj_list,
-            self.lo_name_to_result
+            self.lo_name_to_result,
+            self.context.curr_module
         )
     
     def email_reports(self):

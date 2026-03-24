@@ -25,7 +25,8 @@ class ReportService:
 
     def generate_report(self,
                         student_name: str,
-                        lo_results_mappings: dict[str, LoResult]) -> str:
+                        lo_results_mappings: dict[str, LoResult],
+                        max_module: int) -> str:
         grade_type = GetGradeType(self.context.grade_type)
         grade = self.grade_service.get_grade(grade_type, lo_results_mappings)
         first_name = student_name.split()[0]
@@ -34,7 +35,7 @@ class ReportService:
         list_assgn_or_status_c = self._list_assignments_or_status(lo_results_mappings, Level.JUNIOR)
         list_assgn_or_status_b = self._list_assignments_or_status(lo_results_mappings, Level.MIDDLE)
         list_assgn_or_status_a = self._list_assignments_or_status(lo_results_mappings, Level.SENIOR)
-        overall_los = self._get_overall_los(lo_results_mappings)
+        overall_los = self._get_overall_los(lo_results_mappings, max_module)
 
         curr_module = self.context.curr_module
 
@@ -93,7 +94,10 @@ Best,
 {self.instructor_signoff}
 """
     
-    def generate_reports(self, student_list: list[Student], lo_results_mappings: dict[int, dict[str, LoResult]]):
+    def generate_reports(self,
+                         student_list: list[Student],
+                         lo_results_mappings: dict[int, dict[str, LoResult]],
+                         max_module: int):
         """
         Generate and save progress reports for each student based on their LO results.
         
@@ -104,7 +108,9 @@ Best,
             None
         """
         for student in student_list:
-            report = self.generate_report(student.name, lo_results_mappings.get(student.student_id, {}))
+            report = self.generate_report(student.name,
+                                          lo_results_mappings.get(student.student_id, {}),
+                                          max_module)
             self.save(report, student.name)
 
     def get_latest_report(self, student_name: str):
@@ -159,7 +165,7 @@ Best,
         :param self: Description
         :param lo_results_mappings: Description
         :type lo_results_mappings: dict[str, LoResult]
-        :param target_level: Description
+        :param target_level: The level to list the assignments for (Intern, Junior, etc.)
         :type target_level: str
         :return: Description
         :rtype: str
@@ -187,7 +193,9 @@ Best,
         
         return '\n'.join(result_lines)
     
-    def _get_overall_los(self, lo_results_mappings: dict[str, LoResult]) -> str:
+    def _get_overall_los(self,
+                         lo_results_mappings: dict[str, LoResult],
+                         max_module: int) -> str:
         '''
         Get the overall LO levels for each level.
         
@@ -199,7 +207,10 @@ Best,
         '''
         result_lines = []
         
-        for lo, results in lo_results_mappings.items():
-            result_lines.append(f"{lo}: Level {results.level_score}")
+        for lo_name, results in lo_results_mappings.items():
+            lo = self.lo_service.get_lo_by_name(lo_name)
+
+            if lo and lo.module <= max_module:
+                result_lines.append(f"{lo_name}: Level {results.level_score}")
         
         return '\n'.join(result_lines)
