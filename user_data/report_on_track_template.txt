@@ -1,0 +1,22 @@
+Hi $first_name,
+
+This is a progress message to let you know you're on track to $a_or_an $grade. $progress_statement
+
+We're on module $curr_module.
+
+If you're looking to get a C, please complete all the following junior level assignments:
+$list_assgn_or_status_c
+
+If you're looking to get a B, please complete some of the middle level assignments so that you complete 7 out of the 9 learning outcomes (LOs):
+$list_assgn_or_status_b
+
+If you're looking to get an A, please complete the middle level assignments as listed above AND demonstrate any 7 out of the 9 Senior developer level assignments (most of them are from the final project).
+$list_assgn_or_status_a
+
+Overall, your LOs look like this:
+$overall_los
+
+Please let me know if you have any questions!
+
+Best,
+$instructor_signoff

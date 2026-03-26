@@ -64,7 +64,7 @@
   files accordingly so that I can easily manage the settings without having to manually
   edit the configuration files.
 
-- As a user, I can customize the report template so that I can generate reports to my liking.
+- As a user, I can customize the report template so that I can generate reports to my liking. ✅
 
 - As a user, I can mark rubric and generate report steps for a single student even only with the
   cached data so that I don't have to wait for network calls to grade submissions if I just want

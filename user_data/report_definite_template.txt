@@ -1,0 +1,24 @@
+Hi $first_name,
+
+This is a progress message to let you know that your grade is at $a_or_an $grade ONLY if you don't submit any more assignments.
+
+If you continue to (re)submit incomplete assignments, you're likely on track to $a_or_an $grade.
+
+We're done with all modules and are now on the Final Project.
+
+If you're looking to get a C, please complete all the following junior level assignments:
+$list_assgn_or_status_c
+
+If you're looking to get a B, please complete some of the middle level assignments so that you complete 7 out of the 9 learning outcomes (LOs):
+$list_assgn_or_status_b
+
+If you're looking to get an A, please complete the middle level assignments as listed above AND demonstrate any 7 out of the 9 Senior developer level assignments (most of them are from the final project).
+$list_assgn_or_status_a
+
+Overall, your LOs look like this:
+$overall_los
+
+Please let me know if you have any questions!
+
+Best,
+$instructor_signoff

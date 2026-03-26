@@ -1,4 +1,6 @@
 from datetime import datetime
+from string import Template
+
 from models.student import Student
 from utils.naming import get_student_folder_name
 from utils.paths import BASE_DIR
@@ -32,67 +34,32 @@ class ReportService:
         first_name = student_name.split()[0]
 
         a_or_an = self._get_a_or_an(grade)
+        progress_statement = self._get_progress_statement(grade)
         list_assgn_or_status_c = self._list_assignments_or_status(lo_results_mappings, Level.JUNIOR)
         list_assgn_or_status_b = self._list_assignments_or_status(lo_results_mappings, Level.MIDDLE)
         list_assgn_or_status_a = self._list_assignments_or_status(lo_results_mappings, Level.SENIOR)
         overall_los = self._get_overall_los(lo_results_mappings, max_module)
 
-        curr_module = self.context.curr_module
+        template_file = (
+            "report_definite_template.txt"
+            if grade_type == GetGradeType.DEFINITE
+            else "report_on_track_template.txt"
+        )
+        with open(str(BASE_DIR / "user_data" / template_file)) as f:
+            template = Template(f.read())
 
-        match grade_type:
-            case GetGradeType.DEFINITE:
-                return f"""Hi {first_name},
-
-This is a progress message to let you know that your grade is at {a_or_an} {grade} ONLY if you don't submit any more assignments.
-
-If you continue to (re)submit incomplete assignments, you're likely on track to {a_or_an} {grade}.
-
-We're done with all modules and are now on the Final Project.
-
-If you're looking to get a C, please complete all the following junior level assignments:
-{list_assgn_or_status_c}
-
-If you're looking to get a B, please complete some of the middle level assignments so that you complete 7 out of the 9 learning outcomes (LOs):
-{list_assgn_or_status_b}
-
-If you're looking to get an A, please complete the middle level assignments as listed above AND demonstrate any 7 out of the 9 Senior developer level assignments (most of them are from the final project).
-{list_assgn_or_status_a}
-
-Overall, your LOs look like this:
-{overall_los}
-
-Please let me know if you have any questions!
-
-Best,
-{self.instructor_signoff}
-"""
-            
-            case _:  # default too
-                progress_statement = self._get_progress_statement(grade)
-
-                return f"""Hi {first_name},
-
-This is a progress message to let you know you're on track to {a_or_an} {grade}. {progress_statement}
-
-We're on module {curr_module}.
-
-If you're looking to get a C, please complete all the following junior level assignments:
-{list_assgn_or_status_c}
-
-If you're looking to get a B, please complete some of the middle level assignments so that you complete 7 out of the 9 learning outcomes (LOs):
-{list_assgn_or_status_b}
-
-If you're looking to get an A, please complete the middle level assignments as listed above AND demonstrate any 7 out of the 9 Senior developer level assignments (most of them are from the final project).
-{list_assgn_or_status_a}
-
-Overall, your LOs look like this:
-{overall_los}
-
-Please let me know if you have any questions!
-
-Best,
-{self.instructor_signoff}
-"""
+        return template.safe_substitute(
+            first_name=first_name,
+            a_or_an=a_or_an,
+            curr_module=self.context.curr_module,
+            grade=grade,
+            progress_statement=progress_statement,
+            list_assgn_or_status_c=list_assgn_or_status_c,
+            list_assgn_or_status_b=list_assgn_or_status_b,
+            list_assgn_or_status_a=list_assgn_or_status_a,
+            overall_los=overall_los,
+            instructor_signoff=self.instructor_signoff,
+        )
     
     def generate_reports(self,
                          student_list: list[Student],
