@@ -184,6 +184,25 @@ class LoRepository:
         
         return levels
     
+    def load_cached_results(self, student) -> dict[str, LoResult]:
+        """Load all cached LO results for a student from disk without any network calls.
+
+        Returns:
+            A dict mapping LO name -> LoResult, or an empty dict if no cache exists.
+        """
+        cache_dir = self.context.path_config.students_eval_cache_dir()
+        cached_data = self.file_manager.load_json(
+            file_path=cache_dir / get_student_folder_name(student.name)
+        ) or {}
+
+        results: dict[str, LoResult] = {}
+        for lo_name, lo_data in cached_data.items():
+            lo_result = LoResult.from_dict(lo_data)
+            self.lo_results[lo_name] = lo_result
+            results[lo_name] = lo_result
+
+        return results
+
     def get_lo_result_by_name(self, lo_name: str):
         return self.lo_results[lo_name]
     

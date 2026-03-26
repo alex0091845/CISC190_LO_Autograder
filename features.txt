@@ -68,4 +68,4 @@
 
 - As a user, I can mark rubric and generate report steps for a single student even only with the
   cached data so that I don't have to wait for network calls to grade submissions if I just want
-  to generate a report for a single student.
+  to generate a report for a single student. ✅

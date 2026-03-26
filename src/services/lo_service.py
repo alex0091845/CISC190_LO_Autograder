@@ -52,6 +52,10 @@ class LoService:
 
         return results
     
+    def load_cached_results(self, student) -> dict[str, "LoResult"]:
+        """Load all cached LO results for a student from disk without any network calls."""
+        return self.lo_repository.load_cached_results(student)
+
     def get_lo_by_name(self, lo_name: str, exact_match: bool=False):
         lo = self.lo_repository.get_lo_by_name(lo_name, exact_match)
         # print(f"Got {lo_name=}: {lo=} ")

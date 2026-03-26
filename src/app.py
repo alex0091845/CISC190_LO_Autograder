@@ -71,6 +71,8 @@ class App:
         self.context.should_generate_report = True
         self.context.should_email_report = False
 
+        self.lo_name_to_result: dict[int, dict[str, LoResult]] = {}
+
         GUI = True
 
         if GUI:
@@ -83,8 +85,6 @@ class App:
     def sync(self):
         self.student_obj_list = [self.student_service.get_student(student_id)
                             for student_id in self.context.student_list]
-        self.lo_name_to_result: dict[int, dict[str, LoResult]] = {}
-
         if self.context.should_grade:
             self.grade()
 
@@ -108,9 +108,23 @@ class App:
 
         return self.lo_name_to_result
 
+    def load_results_from_cache(self) -> dict:
+        """Populate lo_name_to_result from each student's cached evaluation file.
+        No network calls are made."""
+        self.lo_name_to_result = {}
+        for student in self.student_obj_list:
+            cached = self.lo_service.load_cached_results(student)
+            if cached:
+                self.lo_name_to_result[student.student_id] = cached
+        return self.lo_name_to_result
+
     def mark_rubric(self):
         if not self.lo_name_to_result:
-            print("No LO results found, cannot mark rubric. Please run grading first.")
+            print("No LO results in memory — loading from cache...")
+            self.load_results_from_cache()
+
+        if not self.lo_name_to_result:
+            print("No cached LO results found, cannot mark rubric.")
             return
         
         self.rubric_rating_service.update_rubric_assessments(
@@ -121,7 +135,11 @@ class App:
     
     def generate_reports(self):
         if not self.lo_name_to_result:
-            print("No LO results found, cannot generate reports. Please run grading first.")
+            print("No LO results in memory — loading from cache...")
+            self.load_results_from_cache()
+
+        if not self.lo_name_to_result:
+            print("No cached LO results found, cannot generate reports.")
             return
         
         self.report_service.generate_reports(
