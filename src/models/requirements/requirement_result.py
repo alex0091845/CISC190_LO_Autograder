@@ -7,5 +7,20 @@ class RequirementResult:
         self.missing = missing or []
         self.completed = completed or []
     
+    def to_dict(self) -> dict:
+        return {
+            "satisfied": self.satisfied,
+            "missing": self.missing,
+            "completed": self.completed,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RequirementResult":
+        return cls(
+            satisfied=data["satisfied"],
+            missing=data.get("missing", []),
+            completed=data.get("completed", []),
+        )
+
     def __repr__(self):
         return f"RequirementResult(satisfied={self.satisfied}, missing={self.missing})"

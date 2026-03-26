@@ -1,14 +1,19 @@
 from yaml import Loader, load
 from context.autograder_context import AutograderContext
+from managers.file_manager import FileManager
 from models.level import Level
 from models.lo import Lo
 from models.requirements.lo_result import LoResult
 from models.requirements.requirement_result import RequirementResult
+from utils.naming import get_student_folder_name
 
 
 class LoRepository:
-    def __init__(self, context: AutograderContext):
+    def __init__(self,
+                 context: AutograderContext,
+                 file_manager: FileManager):
         self.context = context
+        self.file_manager = file_manager
         self.los: dict[str, Lo] = {}  # Mapping of LO names to Lo objects
         self.lo_results: dict[str, LoResult] = {}
         self._initialized = False
@@ -28,22 +33,112 @@ class LoRepository:
     def evaluate(self, **params) -> LoResult:
         lo = params.get("lo")
         if not lo:
-            raise Warning("The parameter 'lo' should be passed into LoService.evaluate() as an Lo object")
+            raise ValueError("The parameter 'lo' is required in LoRepository.evaluate()")
         
         lo_name = lo.name
-        level_results: dict[str, RequirementResult | None] = {}
+        student = params.get("student")
+        use_cache = params.get("use_cache", False)
 
+        # If caching is enabled, check for an existing result before evaluating.
+        if use_cache:
+            if not student:
+                raise ValueError("The parameter 'student' is required when use_cache=True")
+
+            cache_file = (self.context.path_config.students_eval_cache_dir() /
+                          get_student_folder_name(student.name))
+            cached_data = self.file_manager.load_json(file_path=cache_file)
+
+            if cached_data and lo_name in cached_data:
+                print(f"Using cached result for LO {lo_name} for student {student.name}")
+                lo_result = LoResult.from_dict(cached_data[lo_name])
+                self.lo_results[lo_name] = lo_result
+                return lo_result
+
+        # Evaluate all levels otherwise.
         print(f"Evaluating LO: {lo_name}")
-
+        level_results: dict[str, RequirementResult | None] = {}
         for level_name, level in lo.levels.items():
             result = level.evaluate(**params)
             level_results[level_name] = result
             print(f"  Level: {level_name}, Result: {result}")
-        
+
         lo_result = LoResult(level_results)
         self.lo_results[lo_name] = lo_result
 
+        # Persist to the student's cache file, merging with any existing LO results.
+        if student:
+            cache_dir = self.context.path_config.students_eval_cache_dir()
+            cache_filename = get_student_folder_name(student.name)
+            existing_data = self.file_manager.load_json(
+                file_path=cache_dir / cache_filename
+            ) or {}
+            existing_data[lo_name] = lo_result.to_dict()
+            self.file_manager.save_json(        # automatically merges
+                dir_path=cache_dir,
+                filename=cache_filename,
+                data=existing_data,
+            )
+
         return lo_result
+
+    def evaluate_multiple(self,
+                          student,
+                          lo_list: list,
+                          use_cache: bool = False,
+                          **params) -> dict[str, LoResult]:
+        """Evaluate all LOs for a single student.
+
+        Loads the student's cache file once, evaluates any LOs not already
+        cached, then writes everything back in a single save.
+
+        Returns:
+            A dict mapping LO name -> LoResult for this student.
+        """
+        cache_dir = self.context.path_config.students_eval_cache_dir()
+        cache_filename = get_student_folder_name(student.name)
+
+        # Load the student's existing cache once.
+        cached_data = self.file_manager.load_json(
+            file_path=cache_dir / cache_filename
+        ) or {}
+
+        results: dict[str, LoResult] = {}
+        evaluated_new = False
+
+        for lo in lo_list:
+            if lo is None:
+                continue
+            lo_name = lo.name
+
+            if use_cache and lo_name in cached_data:
+                print(f"Using cached result for LO {lo_name} for student {student.name}")
+                lo_result = LoResult.from_dict(cached_data[lo_name])
+            else:
+                print(f"Evaluating LO: {lo_name}")
+                level_results: dict[str, RequirementResult | None] = {}
+                for level_name, level in lo.levels.items():
+                    result = level.evaluate(student=student,
+                                            student_id=student.student_id,
+                                            lo=lo,
+                                            **params)
+                    level_results[level_name] = result
+                    print(f"  Level: {level_name}, Result: {result}")
+                lo_result = LoResult(level_results)
+                cached_data[lo_name] = lo_result.to_dict()
+                evaluated_new = True
+
+            self.lo_results[lo_name] = lo_result
+            results[lo_name] = lo_result
+
+        # Write back only if something new was evaluated.
+        if evaluated_new:
+            self.file_manager.save_json(
+                dir_path=cache_dir,
+                filename=cache_filename,
+                data=cached_data,
+            )
+
+        return results
     
     def get_lo_by_name(self, lo_name: str, exact_match: bool=False) -> Lo | None:
         if exact_match:

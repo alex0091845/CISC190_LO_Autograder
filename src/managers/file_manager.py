@@ -1,7 +1,6 @@
 import json
 
 from pathlib import Path
-from utils.paths import BASE_DIR
 
 
 class FileManager:
@@ -18,38 +17,40 @@ class FileManager:
         return dir_path
     
     def load_json(self, file_path):
-        """Load data from a JSON file."""
-        with open(file_path, 'r', encoding='utf-8') as f:
+        """Load data from a JSON file. Returns None if the file does not exist."""
+        path = Path(str(file_path) + ".json")
+        if not path.exists():
+            return None
+        with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         return data
     
-    # TODO: possibly generalize this to just save?
-    def save_students(self, students, course_name):
+    def save_json(self, dir_path, filename, data):
         """
-        Save student data to a file named 'students.json' in the corresponding
-        course directory.
+        Save data to a json file in the corresponding course directory.
         
         Args:
-            students: List of student dictionaries from Canvas API
-            course_name: The course name
+            dir_path: The path to the directory where the file will be saved
+            filename: The name of the file to save (without the extension)
+            data: The data to save
         """
         # Create directory if doesn't exist
-        dir_path = BASE_DIR / "user_data" / "courses" / course_name
         self.create_directory(dir_path)
 
         # Extract only name and id from students
-        students_data = [
-            {
-                "id": student.get("id"),
-                "name": student.get("name"),
-                "sortable_name": student.get("sortable_name")
-            }
-            for student in students
-        ]
+        # students_data = [
+        #     {
+        #         "id": student.get("id"),
+        #         "name": student.get("name"),
+        #         "sortable_name": student.get("sortable_name")
+        #     }
+        #     for student in students
+        # ]
 
-        file_path = dir_path / "students.json"
+        file_path = dir_path / (filename + ".json")
+
         with open(file_path, 'w', encoding='utf-8') as f:
-            json.dump(students_data, f, indent=2, ensure_ascii=False)
+            json.dump(data, f, indent=2, ensure_ascii=False)
         
-        print(f"Saved {len(students_data)} students to {file_path}")
+        print(f"Saved data to {file_path}")
         return file_path

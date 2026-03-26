@@ -6,7 +6,9 @@ from services.submission_service import SubmissionService
 
 
 class LoService:
-    def __init__(self, lo_repository: LoRepository, context: AutograderContext):
+    def __init__(self,
+                 lo_repository: LoRepository,
+                 context: AutograderContext):
         self.lo_repository = lo_repository
         self.context = context
         self.initialize()
@@ -27,36 +29,28 @@ class LoService:
     def evaluate_multiple(self,
                           student_list: list,
                           course_id: str,
-                          lo_list: list[str],
+                          lo_names_list: list[str],
                           assignment_service: AssignmentService,
-                          submission_service: SubmissionService
-                          ) -> dict[int, dict[str, LoResult]]: # {student_id to {lo_id to LoResult}}
-        # LO name to LoResult objects
-        lo_name_to_result: dict[int, dict[str, LoResult]] = {}
+                          submission_service: SubmissionService,
+                          use_cache: bool = True
+                          ) -> dict[int, dict[str, LoResult]]:  # {student_id -> {lo_name -> LoResult}}
+        # Resolve LO names to Lo objects once — same for every student.
+        lo_list = [self.get_lo_by_name(lo_name, exact_match=False) for lo_name in lo_names_list]
+
+        results: dict[int, dict[str, LoResult]] = {}
 
         for student in student_list:
-            # evaluate each LO in lo list. Doing this here because this gives user greater
-            # control. Considering to create a LoService.evaluate_multiple later.
-            for lo_name in lo_list:     # can allow user to customize lo list
-                lo = self.get_lo_by_name(
-                    lo_name,
-                    exact_match=False
-                )
+            student_results = self.lo_repository.evaluate_multiple(
+                student=student,
+                lo_list=lo_list,
+                use_cache=use_cache,
+                course_id=course_id,
+                assignment_service=assignment_service,
+                submission_service=submission_service,
+            )
+            results[student.student_id] = student_results
 
-                lo_result = self.evaluate(
-                    assignment_service=assignment_service,
-                    submission_service=submission_service,
-                    student_id=student.student_id,
-                    course_id=course_id,
-                    lo=lo
-                )
-
-                # add to results
-                if student.student_id not in lo_name_to_result:
-                    lo_name_to_result[student.student_id] = {}
-                lo_name_to_result[student.student_id][lo_name] = lo_result
-
-        return lo_name_to_result
+        return results
     
     def get_lo_by_name(self, lo_name: str, exact_match: bool=False):
         lo = self.lo_repository.get_lo_by_name(lo_name, exact_match)

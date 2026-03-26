@@ -1,9 +1,10 @@
 # Secrets
 .env
 
-# Personal/sensitive data files
+# Personal/sensitive data/cache files
 user_data/reports/
 courses/
+cache/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

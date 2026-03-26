@@ -19,3 +19,17 @@ class LoResult:
                 self.level_score = max(Level.level_str_to_score(level_name), self.level_score)
         
         self.level_attained = Level.level_score_to_str(self.level_score)
+
+    def to_dict(self) -> dict:
+        return {
+            level_name: result.to_dict() if result is not None else None
+            for level_name, result in self.level_results.items()
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "LoResult":
+        level_results = {
+            level_name: RequirementResult.from_dict(result) if result is not None else None
+            for level_name, result in data.items()
+        }
+        return cls(level_results)

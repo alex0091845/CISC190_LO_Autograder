@@ -4,11 +4,11 @@
     - 
 
 - As a developer, I can implement a single, consistent way to extract report file names
-  so that the code is cleaner and more maintainable.
+  so that the code is cleaner and more maintainable. ✅
 
 - As a developer, I can add (file) caching to each student's evaluation results so that
   if the user wants to re-run the program with different settings, they don't necessarily
-  have to re-evaluate each LO for each student.
+  have to re-evaluate each LO for each student. ✅
 
 - As a developer, I can test each individual run buttons for each workflow step so that
   I can ensure that each step works correctly when executed individually. ✅
@@ -65,3 +65,7 @@
   edit the configuration files.
 
 - As a user, I can customize the report template so that I can generate reports to my liking.
+
+- As a user, I can mark rubric and generate report steps for a single student even only with the
+  cached data so that I don't have to wait for network calls to grade submissions if I just want
+  to generate a report for a single student.

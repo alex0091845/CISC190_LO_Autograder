@@ -32,12 +32,12 @@ class App:
 
         self.api = CanvasApi(self.config.API_BASE_URL, self.config.HEADERS)
         
-        file_manager = FileManager()
+        self.file_manager = FileManager()
 
         course = Course(self.context.course_id)
-        course.fetch_name(self.api)
+        course.get_name(self.api)
 
-        self.lo_repository = LoRepository(self.context)
+        self.lo_repository = LoRepository(self.context, self.file_manager)
         self.lo_service = LoService(self.lo_repository, self.context)
 
         self.assignment_repository = AssignmentRepository(self.context)
@@ -46,7 +46,7 @@ class App:
         self.submission_repository = SubmissionRepository(self.context, self.api)
         self.submission_service = SubmissionService(self.submission_repository, self.context, self.assignment_service, self.api)
 
-        self.student_repository = StudentRepository(file_manager, course, self.api)
+        self.student_repository = StudentRepository(self.file_manager, course, self.api)
         self.student_service = StudentService(self.student_repository)
 
         self.grade_service = GradeService(self.context)
@@ -71,12 +71,14 @@ class App:
         self.context.should_generate_report = True
         self.context.should_email_report = False
 
-        # self.sync()
+        GUI = True
 
-        # GUI
-        root = tk.Tk()
-        self.view = AppView(root, self)
-        root.mainloop()
+        if GUI:
+            root = tk.Tk()
+            self.view = AppView(root, self)
+            root.mainloop()
+        else:
+            self.sync()
 
     def sync(self):
         self.student_obj_list = [self.student_service.get_student(student_id)
@@ -99,7 +101,7 @@ class App:
         self.lo_name_to_result = self.lo_service.evaluate_multiple(
             self.student_obj_list,
             course_id=self.context.course_id,
-            lo_list=self.context.lo_list,
+            lo_names_list=self.context.lo_list,
             assignment_service=self.assignment_service,
             submission_service=self.submission_service
         )
