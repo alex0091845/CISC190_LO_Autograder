@@ -94,3 +94,75 @@ learning_outcomes:
               - criteria:
                   assignment: "Project Submissions (Weekly Checkpoints and Final Submission)"
                   description: "1. Employ design principles of OOP"
+  - "LO6: GUI":
+      module: 7
+      levels:
+        - level: "intern"
+          requirements:
+            assignment: "M7-1 GUIs Intern Level"
+        - level: "junior"
+          requirements:
+            assignment: "M7-2 Junior Developer Programming Challenge"
+        - level: "middle"
+          requirements:
+            assignment: "M7-3 Middle Developer Explanations"
+        - level: "senior"
+          requirements:
+            and:
+              - level_ref: "middle"
+              - criteria:
+                  assignment: "Project Submissions (Weekly Checkpoints and Final Submission)"
+                  description: "6. Construct programs utilizing graphical user interfaces utilizing event-driven programming"
+  - "LO7: Exceptions":
+      module: 8
+      levels:
+        - level: "intern"
+          requirements:
+            assignment: "M8-1 Exception Handling Intern Level"
+        - level: "junior"
+          requirements:
+            assignment: "M8-2 Junior Developer Programming Challenge"
+        - level: "middle"
+          requirements:
+            assignment: "M8-3 Middle Developer Explanations"
+        - level: "senior"
+          requirements:
+            and:
+              - level_ref: "middle"
+              - criteria:
+                  assignment: "Project Submissions (Weekly Checkpoints and Final Submission)"
+                  description: "7. Construct programs utilizing exception handling"
+  - "LO8: File I/O":
+      module: 9
+      levels:
+        - level: "intern"
+          requirements:
+            assignment: "M9-1 File I/O Intern Level"
+        - level: "junior"
+          requirements:
+            assignment: "M9-2 Junior Developer Programming Challenge"
+        - level: "middle"
+          requirements:
+            assignment: "M9-3 Middle Developer Explanations"
+        - level: "senior"
+          requirements:
+            and:
+              - level_ref: "middle"
+              - criteria:
+                  assignment: "Project Submissions (Weekly Checkpoints and Final Submission)"
+                  description: "8. Construct programs utilizing text file I/O"
+  - "LO9: Recursion":
+      module: 10
+      levels:
+        - level: "intern"
+          requirements:
+            assignment: "M10-1 Recursion Intern Level"
+        - level: "junior"
+          requirements:
+            assignment: "M10-2 Junior Developer Level"
+        - level: "middle"
+          requirements:
+            assignment: "M10-3 Middle Developer Programming Challenge"
+        - level: "senior"
+          requirements:
+            assignment: "M10-4 Senior Developer Explanations"
