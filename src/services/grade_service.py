@@ -26,16 +26,20 @@ class GradeService:
         
         curr_module = self.context.curr_module
 
-        if at_least_count[3] >= (curr_module - 2):
+        # if at_least_count[3] >= (curr_module * 2 // 3 - 1):
+        if sum(at_least_count[1:]) >= 16:
             return 'A'
         
-        if at_least_count[3] >= (curr_module - 3):
+        # if at_least_count[3] >= (curr_module * 2 // 3 - 1):
+        if sum(at_least_count[1:]) >= 14:
             return 'B'
         
-        if at_least_count[2] >= (curr_module - 3):
+        # if at_least_count[2] >= (curr_module * 2 // 3 - 1):
+        if sum(at_least_count[1:]) >= 10:
             return 'C'
         
-        if at_least_count[1] >= (curr_module - 3):
+        # if at_least_count[1] >= (curr_module * 2 // 3 - 1):
+        if sum(at_least_count[1:]) >= 5:
             return 'D'
         
         return 'F'
@@ -66,13 +70,14 @@ class GradeService:
     def _get_counts(self, lo_results_mappings: dict[str, LoResult]):
         # map each level from 0-4. Counts how many LOs are at each level
         level_count = [0 for _ in range(5)]
-
-        # counts at least how many of that level (by index) the student has achieved
-        at_least_count = [0 for _ in range(5)]
         
         # first, count
         for _, lo_result in lo_results_mappings.items():
             level_count[lo_result.level_score] += 1
+        
+        # counts at least how many of that level (by index) the student has achieved
+        # copy first so we can accumulate later
+        at_least_count = [level for level in level_count]
         
         # - then, accumulate for "at least"
         # - we always look at elements in level_count
@@ -82,6 +87,6 @@ class GradeService:
         # is at least 0, so that's pointless
         # - basically, prefix sum
         for i in range(len(level_count) - 2, 0, -1):
-            at_least_count[i] = level_count[i] + level_count[i+1]
+            at_least_count[i] += at_least_count[i+1]
 
         return level_count, at_least_count
